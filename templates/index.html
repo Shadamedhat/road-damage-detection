@@ -1,0 +1,196 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Road Damage Detection</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            padding: 35px 16px;
+            font-family: Arial, sans-serif;
+            background: #f2f5f7;
+            color: #1f2937;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 28px;
+        }
+
+        header h1 {
+            color: #176b57;
+            margin-bottom: 10px;
+        }
+
+        .card {
+            background: white;
+            padding: 25px;
+            margin-bottom: 22px;
+            border-radius: 14px;
+            box-shadow: 0 4px 18px rgba(0, 0, 0, 0.05);
+        }
+
+        input[type="file"] {
+            display: block;
+            width: 100%;
+            padding: 14px;
+            border: 1px dashed #9ca3af;
+            border-radius: 8px;
+            margin: 18px 0;
+        }
+
+        button {
+            background: #176b57;
+            color: white;
+            border: none;
+            padding: 13px 22px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 15px;
+        }
+
+        button:hover {
+            background: #105442;
+        }
+
+        .result-image {
+            width: 100%;
+            height: auto;
+            border-radius: 10px;
+            margin: 12px 0;
+        }
+
+        .error {
+            color: #b42318;
+            background: #fef3f2;
+            padding: 12px;
+            border-radius: 8px;
+        }
+
+        .count {
+            background: #e7f4ef;
+            padding: 14px;
+            border-radius: 8px;
+            margin: 18px 0;
+        }
+
+        .table-wrapper {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            text-align: left;
+            padding: 12px;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        th {
+            background: #f8fafc;
+        }
+
+        footer {
+            text-align: center;
+            color: #6b7280;
+            padding: 15px;
+        }
+    </style>
+</head>
+
+<body>
+<div class="container">
+
+    <header>
+        <h1>Road Damage Detection</h1>
+        <p>AI-powered road crack detection using YOLO</p>
+        <p>Upload a road image to detect and localize damage.</p>
+    </header>
+
+    <section class="card">
+        <h2>Upload Image</h2>
+
+        <form method="POST" enctype="multipart/form-data">
+            <input
+                type="file"
+                name="image"
+                accept=".jpg,.jpeg,.png,.webp"
+                required
+            >
+
+            <button type="submit">Detect Road Damage</button>
+        </form>
+
+        {% if error %}
+            <p class="error">{{ error }}</p>
+        {% endif %}
+    </section>
+
+    {% if result_image %}
+    <section class="card">
+        <h2>Detection Results</h2>
+
+        <img
+            class="result-image"
+            src="{{ url_for('static', filename=result_image) }}"
+            alt="Road damage detection output"
+        >
+
+        <div class="count">
+            <strong>Detected Objects:</strong> {{ detections|length }}
+        </div>
+
+        {% if detections %}
+        <h3>Detected Damage Details</h3>
+
+        <div class="table-wrapper">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Damage Class</th>
+                        <th>Confidence</th>
+                        <th>Bounding Box (x1, y1, x2, y2)</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    {% for item in detections %}
+                    <tr>
+                        <td>{{ item.class_name }}</td>
+                        <td>{{ item.confidence }}%</td>
+                        <td>{{ item.bbox }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        {% else %}
+            <p>No road damage detected in this image.</p>
+        {% endif %}
+    </section>
+    {% endif %}
+
+    <footer>
+        Road Damage Object Detection | YOLO
+    </footer>
+
+</div>
+</body>
+</html>
